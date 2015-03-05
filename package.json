@@ -1,6 +1,6 @@
 {
   "name": "parse-mongo-url",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "parse mongodb connection strings.",
   "main": "index.js",
   "scripts": {
