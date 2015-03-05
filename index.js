@@ -7,6 +7,8 @@ module.exports = function(url) {
   var query_string_part = '';
   var dbName = 'admin';
 
+  if (url.indexOf("/") < 0) 
+    url = '127.0.0.1/' + url;
   // Must start with mongodb
   if(url.indexOf("mongodb://") != 0)
     url = 'mongodb://' + url;
