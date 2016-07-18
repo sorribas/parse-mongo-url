@@ -6,8 +6,8 @@ module.exports = function(url) {
   var auth_part = '';
   var query_string_part = '';
   var dbName = 'admin';
-
-  if (url.indexOf("/") < 0) 
+  // if url supplied is null it defaults to localhost
+  if (!url || url.indexOf("/") < 0)
     url = '127.0.0.1/' + url;
   // Must start with mongodb
   if(url.indexOf("mongodb://") != 0)
