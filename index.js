@@ -31,7 +31,7 @@ module.exports = function(url) {
     if(connection_part.indexOf(".sock/") != -1) {
       dbName = connection_part.split(".sock/")[1];
       connection_part = connection_part.split("/", connection_part.indexOf(".sock") + ".sock".length);
-    } 
+    }
   } else if(connection_part.indexOf("/") != -1) {
     dbName = connection_part.split("/")[1];
     connection_part = connection_part.split("/")[0];
@@ -101,7 +101,7 @@ module.exports = function(url) {
   // Get the db name
   object.dbName = dbName || 'admin';
   // Split up all the options
-  urlOptions = (query_string_part || '').split(/[&;]/);    
+  urlOptions = (query_string_part || '').split(/[&;]/);
   // Ugh, we have to figure out which options go to which constructor manually.
   urlOptions.forEach(function(opt) {
     if(!opt) return;
@@ -176,6 +176,14 @@ module.exports = function(url) {
         serverOptions.socketOptions.socketTimeoutMS = parseInt(value, 10);
         replSetServersOptions.socketOptions.socketTimeoutMS = parseInt(value, 10);
         break;
+      case 'noDelay':
+        serverOptions.socketOptions.noDelay = value;
+        replSetServersOptions.socketOptions.socketTimeoutMS = value;
+        break;
+      case 'keepAlive':
+        serverOptions.socketOptions.noDelay = parseInt(value, 10);
+        replSetServersOptions.socketOptions.socketTimeoutMS = parseInt(value, 10);
+        break;
       case 'w':
         dbOptions.w = parseInt(value, 10);
         if(isNaN(dbOptions.w)) dbOptions.w = value;
@@ -199,15 +207,15 @@ module.exports = function(url) {
         } else if(value == 'MONGODB-X509') {
           object.auth = {user: decodeURIComponent(authPart)};
         }
-        
+
         // Only support GSSAPI or MONGODB-CR for now
-        if(value != 'GSSAPI' 
+        if(value != 'GSSAPI'
           && value != 'MONGODB-X509'
           && value != 'MONGODB-CR'
           && value != 'SCRAM-SHA-1'
-          && value != 'PLAIN') 
+          && value != 'PLAIN')
             throw new Error("only GSSAPI, PLAIN, MONGODB-X509, SCRAM-SHA-1 or MONGODB-CR is supported by authMechanism");
-        
+
         // Authentication mechanism
         dbOptions.authMechanism = value;
         break;
@@ -215,7 +223,7 @@ module.exports = function(url) {
         dbOptions.wtimeout = parseInt(value, 10);
         break;
       case 'readPreference':
-        if (['primary', 'primaryPreferred', 'secondary', 'secondaryPreferred', 'nearest'].indexOf(value) === -1) 
+        if (['primary', 'primaryPreferred', 'secondary', 'secondaryPreferred', 'nearest'].indexOf(value) === -1)
           throw new Error("readPreference must be either primary/primaryPreferred/secondary/secondaryPreferred/nearest");
         dbOptions.read_preference = value;
         break;
