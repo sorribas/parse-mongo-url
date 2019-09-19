@@ -6,18 +6,23 @@ module.exports = function(url) {
   var auth_part = '';
   var query_string_part = '';
   var dbName = 'admin';
+  var mongoRegex = /mongodb(\+srv)?:\/\//;
+  var mongodbPart = mongoRegex.test(url) ? mongoRegex.exec(url)[0] : null;
+
   // if url supplied is null it defaults to localhost
   if (!url || url.indexOf("/") < 0)
     url = '127.0.0.1/' + url;
-  // Must start with mongodb
-  if(url.indexOf("mongodb://") != 0)
+  // Must start with mongodb or mongodb+
+  if(mongodbPart === null || url.indexOf(mongodbPart) !== 0){
     url = 'mongodb://' + url;
+    mongodbPart = mongoRegex.exec(url)[0];
+  }
   // If we have a ? mark cut the query elements off
   if(url.indexOf("?") != -1) {
     query_string_part = url.substr(url.indexOf("?") + 1);
-    connection_part = url.substring("mongodb://".length, url.indexOf("?"))
+    connection_part = url.substring(mongodbPart.length, url.indexOf("?"))
   } else {
-    connection_part = url.substring("mongodb://".length);
+    connection_part = url.substring(mongodbPart.length);
   }
 
   // Check if we have auth params
@@ -39,6 +44,7 @@ module.exports = function(url) {
 
   // Result object
   var object = {};
+  object.usingSrv = "mongodb+srv://" === mongodbPart;
 
   // Pick apart the authentication part of the string
   var authPart = auth_part || '';
@@ -70,7 +76,7 @@ module.exports = function(url) {
   if(url.match(/\.sock/)) {
     // Split out the socket part
     var domainSocket = url.substring(
-        url.indexOf("mongodb://") + "mongodb://".length
+        url.indexOf(mongodbPart) + mongodbPart.length
       , url.lastIndexOf(".sock") + ".sock".length);
     // Clean out any auth stuff if any
     if(domainSocket.indexOf("@") != -1) domainSocket = domainSocket.split("@")[1];
@@ -246,6 +252,10 @@ module.exports = function(url) {
 
         // Set the preferences tags
         dbOptions.read_preference_tags.push(tagObject);
+        break;
+      case 'retryWrites':
+        serverOptions.retryWrites = (value == 'true');
+        replSetServersOptions.retryWrites = (value == 'true');
         break;
       default:
         break;
